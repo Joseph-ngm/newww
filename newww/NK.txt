@@ -1,0 +1,149 @@
+ÉTAPE 1 : Création de la topologie réseau
+📌 Matériel nécessaire dans Cisco Packet Tracer :
+1 Routeur principal (192.168.1.1)
+3 Switches (un pour chaque sous-réseau)
+1 Point d’accès Wi-Fi (pour le réseau Employés)
+20 PC Employés (dans 192.168.10.0/24)
+1 Serveur Web et 1 Serveur Mail (dans la DMZ : 192.168.20.0/24)
+1 Serveur de stockage sécurisé (dans la zone sensible : 192.168.30.0/24)
+Pare-feux (entre chaque sous-réseau)
+📌 Étapes à suivre :
+Ajoute tous les équipements dans Cisco Packet Tracer.
+Connecte les équipements avec les câbles appropriés :
+Routeur ⟷ Switch Employés
+Routeur ⟷ Switch DMZ
+Routeur ⟷ Switch Zone Sensible
+PC et serveurs aux switches respectifs.
+Attribue les bonnes adresses IP à chaque équipement.
+ÉTAPE 2 : Configuration des sous-réseaux et des adresses IP
+Nous allons assigner les IPs et configurer le routage.
+
+📌 Configuration des IPs pour les PC et serveurs :
+Réseau Employés (192.168.10.0/24)
+
+Routeur : 192.168.10.1
+PC Employés : 192.168.10.2 à 192.168.10.21
+Point d’accès Wi-Fi : 192.168.10.50
+DMZ (192.168.20.0/24)
+
+Routeur : 192.168.20.1
+Serveur Web : 192.168.20.10
+Serveur Mail : 192.168.20.20
+Zone Sensible (192.168.30.0/24)
+
+Routeur : 192.168.30.1
+Serveur Stockage : 192.168.30.10
+📌 Configuration du routeur principal
+Dans Cisco Packet Tracer, ouvre le CLI du routeur et entre ces commandes :
+
+bash
+Copier le code
+enable
+configure terminal
+
+! Configuration des interfaces du routeur
+interface GigabitEthernet0/0
+ip address 192.168.10.1 255.255.255.0
+no shutdown
+
+interface GigabitEthernet0/1
+ip address 192.168.20.1 255.255.255.0
+no shutdown
+
+interface GigabitEthernet0/2
+ip address 192.168.30.1 255.255.255.0
+no shutdown
+
+! Activation du routage entre les sous-réseaux
+ip routing
+
+exit
+write memory
+PROCHAINES ÉTAPES :
+✅ Créer et connecter les équipements → (Tu peux le faire maintenant dans Packet Tracer)
+✅ Configurer les adresses IP (manuellement pour les PC et avec CLI pour le routeur)
+➡️ Ensuite, on ajoutera la sécurité (ACL, pare-feu, NAT, etc.)
+
+Dis-moi si tu veux que je t’aide à dessiner le schéma ou si tu rencontres un souci dans Packet Tracer ! 🚀
+
+
+
+
+
+Vous avez dit :
+et le switch employé..
+ChatGPT a dit :
+Bonne question ! Le switch Employés est essentiel pour connecter les 20 postes de travail et le point d'accès Wi-Fi. Il faut donc le configurer correctement pour assurer la communication avec le routeur principal.
+
+📌 ÉTAPE 3 : Configuration du Switch Employés
+Nous allons : ✅ Attribuer une adresse IP au switch (pour l’administration)
+✅ Configurer les ports pour les PC et le point d'accès Wi-Fi
+✅ Activer le protocole Spanning Tree (STP) pour éviter les boucles
+
+1️⃣ Connexion des équipements au switch
+Dans Cisco Packet Tracer, connecte :
+
+Les 20 PC → Ports FastEthernet 0/1 à 0/20
+Le point d’accès Wi-Fi → Port FastEthernet 0/21
+Le switch au routeur → Port GigabitEthernet 0/1
+2️⃣ Configuration du Switch Employés
+Ouvre le CLI du switch et entre les commandes suivantes :
+
+bash
+Copier le code
+enable
+configure terminal
+
+! Donner un nom au switch
+hostname Switch_Employes
+
+! Configurer une adresse IP pour la gestion du switch
+interface vlan 1
+ip address 192.168.10.100 255.255.255.0
+no shutdown
+
+! Configurer le port du switch connecté au routeur
+interface GigabitEthernet0/1
+switchport mode access
+switchport access vlan 1
+no shutdown
+
+! Activer le spanning-tree pour éviter les boucles
+spanning-tree mode rapid-pvst
+
+! Enregistrer la configuration
+exit
+write memory
+3️⃣ Configuration des ports pour les PC
+Par défaut, les ports du switch sont en mode dynamique. Pour éviter des problèmes, on va les forcer en mode access :
+
+bash
+Copier le code
+interface range FastEthernet0/1-20
+switchport mode access
+switchport access vlan 1
+no shutdown
+exit
+4️⃣ Configuration du port pour le point d’accès Wi-Fi
+Si ton point d'accès Wi-Fi gère plusieurs VLANs (exemple : un VLAN pour invités et un autre pour employés), on doit configurer un trunk :
+
+bash
+Copier le code
+interface FastEthernet0/21
+switchport mode trunk
+switchport trunk allowed vlan 1
+no shutdown
+exit
+Si le Wi-Fi ne concerne que les employés, laisse-le en mode access comme les PC.
+
+🎯 Résumé de la configuration du switch
+Le switch a une IP (192.168.10.100) pour l’administration.
+Les ports PC sont en mode access sur VLAN 1.
+Le port du point d’accès est configuré en trunk (si besoin de plusieurs VLANs).
+Le port vers le routeur est en access VLAN 1.
+Activation du Spanning Tree pour éviter les boucles réseau.
+📌 PROCHAINES ÉTAPES
+✅ Le switch Employés est configuré !
+➡️ Maintenant, on passe à la configuration des ACLs sur le routeur pour sécuriser les accès entre sous-réseaux.
+
+Dis-moi si tu veux tester la connectivité (avec ping dans Packet Tracer) avant d’avancer ! 🚀
